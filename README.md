@@ -1,7 +1,7 @@
 <!-- markdownlint-disable -->
 <br />
 <div align="center">
-  <a href="https://github.com/nvim-neorocks/rocks-config.nvim">
+  <a href="https://github.com/lumen-oss/rocks-config.nvim">
     <img src="./rocks-header.svg" alt="rocks-config.nvim">
   </a>
   <p align="center">
@@ -9,15 +9,15 @@
     <!-- <a href="./doc/rocks-config.txt"><strong>Explore the docs »</strong></a> -->
     <!-- <br /> -->
     <br />
-    <a href="https://github.com/nvim-neorocks/rocks-config.nvim/issues/new?assignees=&labels=bug">Report Bug</a>
+    <a href="https://github.com/lumen-oss/rocks-config.nvim/issues/new?assignees=&labels=bug">Report Bug</a>
     ·
-    <a href="https://github.com/nvim-neorocks/rocks-config.nvim/issues/new?assignees=&labels=enhancement">Request Feature</a>
+    <a href="https://github.com/lumen-oss/rocks-config.nvim/issues/new?assignees=&labels=enhancement">Request Feature</a>
     ·
-    <a href="https://github.com/nvim-neorocks/rocks.nvim/discussions/new?category=q-a">Ask Question</a>
+    <a href="https://github.com/lumen-oss/rocks.nvim/discussions/new?category=q-a">Ask Question</a>
   </p>
   <p>
     <strong>
-      Allow <a href="https://github.com/nvim-neorocks/rocks.nvim/">rocks.nvim</a> to help configure your plugins!
+      Allow <a href="https://github.com/lumen-oss/rocks.nvim/">rocks.nvim</a> to help configure your plugins!
     </strong>
   </p>
 </div>
@@ -27,7 +27,7 @@
 
 ## :star2: Summary
 
-`rocks-config.nvim` extends [`rocks.nvim`](https://github.com/nvim-neorocks/rocks-config.nvim)
+`rocks-config.nvim` extends [`rocks.nvim`](https://github.com/lumen-oss/rocks-config.nvim)
 with the ability to configure your plugins.
 
 ## :hammer: Installation

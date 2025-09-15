@@ -6,8 +6,8 @@
 SUMMARY                                                 *rocks-config-summary*
 
 `rocks-config.nvim` extends `rocks.nvim`
-<https://github.com/nvim-neorocks/rocks-config.nvim> with the ability to
-configure your plugins.
+<https://github.com/lumen-oss/rocks-config.nvim> with the ability to configure
+your plugins.
 
 
 INSTALLATION                                       *rocks-config-installation*

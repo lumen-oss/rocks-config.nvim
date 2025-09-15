@@ -1,11 +1,16 @@
 {
   description = "Allow rocks.nvim to help configure your plugins";
 
+  nixConfig = {
+    extra-substituters = "https://lumen-labs.cachix.org";
+    extra-trusted-public-keys = "lumen-labs.cachix.org-1:WmGwJxPmN6cIqKJHYTq/C1WIaqIUneH+t+BAT34Qag0=";
+  };
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    rocks-nvim-input.url = "github:nvim-neorocks/rocks.nvim";
+    rocks-nvim-input.url = "github:lumen-oss/rocks.nvim";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    neorocks.url = "github:nvim-neorocks/neorocks";
+    neorocks.url = "github:lumen-oss/neorocks";
     gen-luarc.url = "github:mrcjkb/nix-gen-luarc-json";
     cats-doc.url = "github:mrcjkb/cats-doc";
     git-hooks = {
