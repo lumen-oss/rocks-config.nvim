@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.3](https://github.com/lumen-oss/rocks-config.nvim/compare/v3.1.2...v3.1.3) (2025-09-15)
+
+
+### Bug Fixes
+
+* update nvim-neorocks references -&gt; lumen-oss ([0bf7bec](https://github.com/lumen-oss/rocks-config.nvim/commit/0bf7bec7f1c32a255d398f5742463ff3c7c286e6))
+
 ## [3.1.2](https://github.com/lumen-oss/rocks-config.nvim/compare/v3.1.1...v3.1.2) (2025-07-14)
 
 
