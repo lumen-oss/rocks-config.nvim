@@ -1,6 +1,9 @@
 # Compiled Lua sources
 luac.out
 
+# generated
+.pre-commit-config.yaml 
+
 # luarocks build files
 *.src.rock
 *.zip
