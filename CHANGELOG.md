@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.0](https://github.com/lumen-oss/rocks-config.nvim/compare/v3.1.3...v3.2.0) (2026-01-29)
+
+
+### Features
+
+* display error count when warning about issues ([#84](https://github.com/lumen-oss/rocks-config.nvim/issues/84)) ([73770ae](https://github.com/lumen-oss/rocks-config.nvim/commit/73770ae9393b877d7ab6256ac9dfd9416cca1c23))
+
 ## [3.1.3](https://github.com/lumen-oss/rocks-config.nvim/compare/v3.1.2...v3.1.3) (2025-09-15)
 
 
