@@ -161,9 +161,9 @@ local function auto_setup(plugin_heuristics, config, rock)
 end
 
 ---Check if any errors were registered during setup.
----@return boolean
+---@return number
 local function errors_found()
-    return #rocks_config.duplicate_configs_found > 0 or #rocks_config.failed_to_load > 0
+    return #rocks_config.duplicate_configs_found + #rocks_config.failed_to_load
 end
 
 ---@return rocks-config.Toml
@@ -417,9 +417,13 @@ Did you make a typo, or is the plugin not installed?
         pcall(vim.cmd.colorscheme, config.config.colorscheme or config.config.colourscheme)
     end
 
-    if errors_found() then
+    local error_count = errors_found()
+    if error_count > 0 then
         vim.notify(
-            "Issues found while loading plugin configs. Run :checkhealth rocks-config for more info.",
+            string.format(
+                "%d issue(s) found while loading plugin configs. Run :checkhealth rocks-config for more info.",
+                error_count
+            ),
             vim.log.levels.WARN
         )
     end
