@@ -11,6 +11,11 @@ local rocks_config = {}
 ---Takes the bundle items as an argument.
 ---@field load_bundle_pre? fun(bundle_items:string[])
 
+---Load configurations for all installed plugins
+function rocks_config.configure_all()
+    require("lux-config.internal").configure_all()
+end
+
 ---Load a plugin's configuration
 ---@param plugin string | lux-config.RockSpec The name of the plugin to configure
 ---@param opts? lux-config.configure.Opts

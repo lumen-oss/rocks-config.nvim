@@ -66,7 +66,7 @@ return M
         fh:close()
         assert.same("function", type(require("bla").setup))
 
-        rocks_config.setup()
+        rocks_config.configure_all()
         assert.True(vim.g.foo_nvim_loaded)
         assert.True(vim.g.bar_nvim_loaded)
         assert.True(vim.g.bat_nvim_loaded)

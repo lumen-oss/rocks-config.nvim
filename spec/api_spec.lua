@@ -86,7 +86,7 @@ vim.g.opt_bundle_loaded = true
         api.configure("foo.nvim")
         assert.True(vim.g.foo_nvim_loaded)
         assert.is_nil(vim.g.baz_bundle_loaded)
-        require("lux-config.internal").setup()
+        require("lux-config").configure_all()
         assert.True(vim.g.baz_bundle_loaded)
         assert.True(vim.g.bad_bundle_loaded)
         api.configure("bad.nvim")

@@ -350,7 +350,7 @@ function rocks_config.get_bundle(rock_spec)
 end
 
 ---@param all_plugins? table<rock_name, RockSpec>
-function rocks_config.setup(all_plugins)
+function rocks_config.configure_all(all_plugins)
     local config = get_config()
 
     ---@param rock_name string
