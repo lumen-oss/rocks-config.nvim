@@ -31,12 +31,23 @@ function M.get()
     local config_dir = vim.fn.stdpath("config")
     ---@cast config_dir string
     local toml_path = vim.fs.joinpath(config_dir, "lux.toml")
-    local fh = io.open(toml_path, "r")
-    if not fh then
+    local fd = vim.uv.fs_open(toml_path, "r", 438)
+    if not fd then
+        vim.schedule(function()
+            vim.notify(("lux-config: failed to read %s"):format(toml_path), vim.log.levels.ERROR)
+        end)
         return nil
     end
-    local content = fh:read("*a")
-    fh:close()
+    local stat = vim.uv.fs_fstat(fd)
+    if not stat then
+        vim.uv.fs_close(fd)
+        vim.schedule(function()
+            vim.notify(("lux-config: failed to read %s"):format(toml_path), vim.log.levels.ERROR)
+        end)
+        return nil
+    end
+    local content = vim.uv.fs_read(fd, stat.size, 0)
+    vim.uv.fs_close(fd)
 
     ---@diagnostic disable-next-line: unresolved-require
     local toml = require("toml_edit").parse_as_tbl(content)
