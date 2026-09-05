@@ -15,6 +15,6 @@ vim.g.rocks_config_nvim_loaded = true
 return {
     type = "Action",
     hook = function(...)
-        require("rocks-config.internal").setup(...)
+        require("lux-config.internal").setup(...)
     end,
 }

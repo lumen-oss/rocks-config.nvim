@@ -1,4 +1,4 @@
-local api = require("rocks-config")
+local api = require("lux-config")
 
 local tempdir = vim.fn.tempname()
 vim.system({ "rm", "-r", tempdir }):wait()
@@ -87,7 +87,7 @@ vim.g.opt_bundle_loaded = true
         api.configure("foo.nvim")
         assert.True(vim.g.foo_nvim_loaded)
         assert.is_nil(vim.g.baz_bundle_loaded)
-        require("rocks-config.internal").setup()
+        require("lux-config.internal").setup()
         assert.True(vim.g.baz_bundle_loaded)
         assert.True(vim.g.bad_bundle_loaded)
         api.configure("bad.nvim")

@@ -1,6 +1,6 @@
 local health = {}
 
-local rocks_config = require("rocks-config.internal")
+local rocks_config = require("lux-config.internal")
 
 local function check_for_load_errors()
     vim.health.start("Checking for errors while loading configs")

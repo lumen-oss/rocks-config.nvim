@@ -1,4 +1,4 @@
-local rocks_config = require("rocks-config.internal")
+local rocks_config = require("lux-config.internal")
 
 local tempdir = vim.fn.tempname()
 vim.system({ "rm", "-r", tempdir }):wait()
