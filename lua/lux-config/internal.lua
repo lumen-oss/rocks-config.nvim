@@ -295,7 +295,7 @@ end
 function rocks_config.load_bundle(bundle_name)
     local config = get_config()
     ---@type string, lux-config.Bundle?
-    ---@diagnostic disable-next-line: call-non-callable
+    ---@diagnostic disable-next-line: call-non-callable,redundant-parameter
     local _, bundle = vim.iter(config.bundles or {}):find(function(name)
         if name == bundle_name then
             return true
@@ -315,7 +315,7 @@ function rocks_config.load_bundle(bundle_name)
         return get_rock_from_config(config, rock_name)
     end
     ---@param item string
-    ---@diagnostic disable-next-line: call-non-callable
+    ---@diagnostic disable-next-line: call-non-callable,redundant-parameter
     local nonexistent_bundle_item = vim.iter(bundle.items):find(function(item)
         return get_rock(item) == nil
     end)
@@ -344,7 +344,7 @@ function rocks_config.get_bundle(rock_spec)
     local rock_name = type(rock_spec) == "string" and rock_spec or rock_spec.name
     local config = get_config()
     ---@type string, lux-config.Bundle | nil
-    ---@diagnostic disable-next-line: call-non-callable
+    ---@diagnostic disable-next-line: call-non-callable,redundant-parameter
     local name, bundle = vim.iter(config.bundles or {}):find(function(_, b)
         if vim.list_contains(b.items, rock_name) then
             return true
@@ -376,7 +376,7 @@ function rocks_config.configure_all(all_plugins)
         for bundle_name, bundle in pairs(config.bundles) do
             if type(bundle) == "table" and type(bundle.items) == "table" then
                 ---@param item string
-                ---@diagnostic disable-next-line: call-non-callable
+                ---@diagnostic disable-next-line: call-non-callable,redundant-parameter
                 local nonexistent_bundle_item = vim.iter(bundle.items):find(function(item)
                     return get_rock(item) == nil
                 end)
@@ -395,14 +395,15 @@ Did you make a typo, or is the plugin not installed?
                     goto continue
                 end
 
-                local is_opt_bundle = not config.config.load_opt_plugins
+                local is_opt_bundle = false
+                if not config.config.load_opt_plugins then
                     ---@param item string
-                    ---@diagnostic disable-next-line: call-non-callable
-                    and vim.iter(bundle.items):any(function(item)
+                    ---@diagnostic disable-next-line: call-non-callable,redundant-parameter
+                    is_opt_bundle = vim.iter(bundle.items):any(function(item)
                         local rock = get_rock(item)
-                        ---@cast rock lux-config.RockSpec
-                        return rock.opt
-                    end)
+                        return rock ~= nil and rock.opt == true
+                    end) == true
+                end
                 if is_opt_bundle then
                     goto continue
                 end
