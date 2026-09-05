@@ -4,28 +4,21 @@ local tempdir = vim.fn.tempname()
 vim.system({ "rm", "-r", tempdir }):wait()
 vim.system({ "mkdir", "-p", tempdir .. "/lua/plugins" }):wait()
 vim.system({ "mkdir", "-p", tempdir .. "/lua/bla" }):wait()
-vim.g.rocks_nvim = {
-    rocks_path = tempdir,
-    config_path = vim.fs.joinpath(tempdir, "rocks.toml"),
-}
-vim.opt.rtp:append(tempdir)
+vim.opt.runtimepath:append(tempdir)
 
 describe("setup", function()
     it("Loads configs", function()
+        stub(vim.fn, "stdpath", function(_)
+            return tempdir
+        end)
         local config_content = [[
-[plugins]
+[dependencies]
 "foo.nvim" = "1.0.0"
 "bar.nvim" = "1.0.0"
 "bat.nvim" = { version = "1.0.0", config = "plugins.fledermaus" }
-
-[plugins."bla.nvim"]
-version = "1.0.0"
-
-[plugins."bla.nvim".config]
-bla = true
+"bla.nvim" = { version = "1.0.0", config = { bla = true } }
 ]]
-        local config = require("rocks.config.internal")
-        local fh = assert(io.open(config.config_path, "w"), "Could not open rocks.toml for writing")
+        local fh = assert(io.open(vim.fs.joinpath(tempdir, "lux.toml"), "w"), "Could not open lux.toml for writing")
         fh:write(config_content)
         fh:close()
 
@@ -73,7 +66,6 @@ return M
         fh:close()
         assert.same("function", type(require("bla").setup))
 
-        vim.opt.runtimepath:append(tempdir)
         rocks_config.setup()
         assert.True(vim.g.foo_nvim_loaded)
         assert.True(vim.g.bar_nvim_loaded)

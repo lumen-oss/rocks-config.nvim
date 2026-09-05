@@ -1,5 +1,5 @@
 local constants = require("lux-config.constants")
-local api = require("rocks.api")
+local toml = require("lux-config.toml")
 
 local rocks_config = {
     duplicate_configs_found = {},
@@ -168,8 +168,8 @@ end
 
 ---@return lux-config.Toml
 local function get_config()
-    local rocks_toml = api.get_rocks_toml()
-    return vim.tbl_deep_extend("force", {}, constants.DEFAULT_CONFIG, rocks_toml or {})
+    local lux_toml = toml.get()
+    return vim.tbl_deep_extend("force", {}, constants.DEFAULT_CONFIG, lux_toml or {})
 end
 
 ---@param rock rock_name | lux-config.RockSpec The rock to configure
@@ -180,10 +180,10 @@ function rocks_config.configure(rock, config)
         if _configured_rocks[rock] then
             return
         end
-        local all_plugins = api.get_user_rocks()
+        local all_plugins = config.plugins
         ---@cast all_plugins table<string, lux-config.RockSpec>
         if not all_plugins[rock] then
-            vim.notify(("[lux-config.nvim]: Plugin %s not found in rocks.toml"):format(rock), vim.log.levels.ERROR)
+            vim.notify(("[lux-config.nvim]: Plugin %s not found in lux.toml"):format(rock), vim.log.levels.ERROR)
             return
         end
         rock = all_plugins[rock]
@@ -405,7 +405,7 @@ Did you make a typo, or is the plugin not installed?
         end
     end
 
-    all_plugins = all_plugins or api.get_user_rocks()
+    all_plugins = all_plugins or config.plugins or {}
     for _, rock_spec in pairs(all_plugins) do
         ---@cast rock_spec lux-config.RockSpec
         if not rock_spec.opt or config.config.load_opt_plugins then

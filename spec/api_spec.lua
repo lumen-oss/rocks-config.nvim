@@ -3,15 +3,14 @@ local api = require("lux-config")
 local tempdir = vim.fn.tempname()
 vim.system({ "rm", "-r", tempdir }):wait()
 vim.system({ "mkdir", "-p", tempdir .. "/lua/plugins" }):wait()
-vim.g.rocks_nvim = {
-    rocks_path = tempdir,
-    config_path = vim.fs.joinpath(tempdir, "rocks.toml"),
-}
 
 describe("Lua API", function()
     it("Loads configs", function()
+        stub(vim.fn, "stdpath", function(_)
+            return tempdir
+        end)
         local config_content = [[
-[plugins]
+[dependencies]
 "foo.nvim" = "1.0.0"
 "bar.nvim" = "1.0.0"
 "bad-nvim" = "1.0.0"
@@ -20,20 +19,20 @@ describe("Lua API", function()
 "opt2.nvim" = { version = "1.0.0", opt = true }
 "opt3.nvim" = { version = "1.0.0", opt = true }
 
-[bundles.baz]
+[neovim.bundles.baz]
 items = [ "bar.nvim" ]
-[bundles.bad_bundle]
+
+[neovim.bundles.bad_bundle]
 items = [ "bad2-nvim" ]
 
-[bundles.opt_bundle]
+[neovim.bundles.opt_bundle]
 items = [
   "opt1.nvim",
   "opt2.nvim",
   "opt3.nvim"
 ]
 ]]
-        local config = require("rocks.config.internal")
-        local fh = assert(io.open(config.config_path, "w"), "Could not open rocks.toml for writing")
+        local fh = assert(io.open(vim.fs.joinpath(tempdir, "lux.toml"), "w"), "Could not open lux.toml for writing")
         fh:write(config_content)
         fh:close()
         local plugin_config_content = [[
