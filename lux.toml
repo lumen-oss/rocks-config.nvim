@@ -8,7 +8,6 @@ labels = [ "lua", "lux", "neovim", "neovim-plugin", "nvim", "plugin-manager" ]
 license = "GPL-3.0"
 
 [dependencies]
-"rocks.nvim" = ">= 2.32.1"
 "toml-edit" = ">= 0.3.0"
 
 [test]

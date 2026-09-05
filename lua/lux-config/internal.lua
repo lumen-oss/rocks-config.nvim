@@ -6,12 +6,12 @@ local rocks_config = {
     failed_to_load = {},
 }
 
----@type table<rock_name, boolean>
+---@type table<lux-config.rock_name, boolean>
 local _configured_rocks = {}
 
 ---@class lux-config.Toml: lux-config.Config
----@field rocks? table<string, RockSpec[]>
----@field plugins? table<string, RockSpec[]>
+---@field rocks? table<string, lux-config.RockSpec[]>
+---@field plugins? table<string, lux-config.RockSpec[]>
 ---@field bundles? table<string, lux-config.Bundle>
 
 ---Deduplicates a table that is being used as an array of strings
@@ -142,7 +142,7 @@ end
 
 ---@param plugin_heuristics string[]
 ---@param config lux-config.Config
----@param rock RockSpec
+---@param rock lux-config.RockSpec
 local function auto_setup(plugin_heuristics, config, rock)
     xpcall(function()
         for _, possible_match in ipairs(plugin_heuristics) do
@@ -172,7 +172,7 @@ local function get_config()
     return vim.tbl_deep_extend("force", {}, constants.DEFAULT_CONFIG, lux_toml or {})
 end
 
----@param rock rock_name | lux-config.RockSpec The rock to configure
+---@param rock lux-config.rock_name | lux-config.RockSpec The rock to configure
 ---@param config? lux-config.Config
 function rocks_config.configure(rock, config)
     config = config or get_config()
@@ -229,13 +229,13 @@ end
 
 ---@param config lux-config.Toml
 ---@param rock_name string
----@return RockSpec | nil
+---@return lux-config.RockSpec | nil
 local function get_rock_from_config(config, rock_name)
     return (config.plugins or {})[rock_name] or (config.rocks or {})[rock_name]
 end
 
 ---@class lux-config.Bundle
----@field items? rock_name[]
+---@field items? lux-config.rock_name[]
 ---@field config? string
 
 ---@param config lux-config.Toml
@@ -307,7 +307,7 @@ function rocks_config.load_bundle(bundle_name)
     end
 
     ---@param rock_name string
-    ---@return RockSpec | nil
+    ---@return lux-config.RockSpec | nil
     local function get_rock(rock_name)
         return get_rock_from_config(config, rock_name)
     end
@@ -334,8 +334,8 @@ Did you make a typo, or is the plugin not installed?
     load_bundle(config, bundle_name, bundle)
 end
 
----@param rock_spec rock_name | RockSpec
----@return string | nil, rock_name[] | nil
+---@param rock_spec lux-config.rock_name | lux-config.RockSpec
+---@return string | nil, lux-config.rock_name[] | nil
 function rocks_config.get_bundle(rock_spec)
     local rock_name = type(rock_spec) == "string" and rock_spec or rock_spec.name
     local config = get_config()
@@ -349,12 +349,12 @@ function rocks_config.get_bundle(rock_spec)
     return name, bundle and bundle.items
 end
 
----@param all_plugins? table<rock_name, RockSpec>
+---@param all_plugins? table<lux-config.rock_name, lux-config.RockSpec>
 function rocks_config.configure_all(all_plugins)
     local config = get_config()
 
     ---@param rock_name string
-    ---@return RockSpec | nil
+    ---@return lux-config.RockSpec | nil
     local function get_rock(rock_name)
         return get_rock_from_config(config, rock_name)
     end

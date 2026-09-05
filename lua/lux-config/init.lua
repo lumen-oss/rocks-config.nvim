@@ -2,9 +2,6 @@
 
 local rocks_config = {}
 
----@class lux-config.RockSpec: RockSpec
----@field config? string | boolean
-
 ---@class lux-config.configure.Opts
 ---
 ---Callback that is invoked before loading a plugin bundle.
