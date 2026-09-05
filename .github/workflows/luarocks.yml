@@ -1,45 +1,31 @@
-name: Push to Luarocks
-
+---
+name: "Push to LuaRocks"
 on:
   push:
     tags:
-      - '*'
-  release:
-    types:
-      - created
-  pull_request:
+      - "*"
   workflow_dispatch:
 
 jobs:
-  luarocks-upload:
-    runs-on: ubuntu-24.04
+  luarocks-release:
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0 # Required to count the commits
-      - name: Get Version
-        run: echo "LUAROCKS_VERSION=$(git describe --abbrev=0 --tags)" >> $GITHUB_ENV
-      - name: Install Rust toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          rustflags: ""
-      - name: LuaRocks Upload
-        uses: nvim-neorocks/luarocks-tag-release@v7
-        env:
-          LUAROCKS_API_KEY: ${{ secrets.LUAROCKS_API_KEY }}
-        with:
-          version: ${{ env.LUAROCKS_VERSION }}
-          test_interpreters: ""
-          dependencies: |
-            lua == 5.1
-            rocks.nvim >= 2.32.1
-          labels: |
-            neovim
-          detailed_description: |
-            rocks-config.nvim is a rocks.nvim utility module for helping to configure
-            your Neovim setup.
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
-            Features:
-            - Execute a specific Lua file per plugin
-            - Automatically invoke the setup() function for every installed plugin
-            - Statically configure a plugin using TOML syntax directly from within your rocks.toml
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Install Lux
+        uses: lumen-oss/gh-actions-lux@v1
+        with:
+          version: 0.43.3
+
+      - name: Upload
+        run: |
+          lx --nvim upload
+        env:
+          LUX_API_KEY: ${{ secrets.LUAROCKS_API_KEY }}
