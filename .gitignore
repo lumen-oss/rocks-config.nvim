@@ -2,7 +2,7 @@
 luac.out
 
 # generated
-.pre-commit-config.yaml 
+.pre-commit-config.yaml
 
 # luarocks build files
 *.src.rock
@@ -42,6 +42,6 @@ luac.out
 *.x86_64
 *.hex
 
-.luarc.json
-result
+result*
+.lux
 .direnv
