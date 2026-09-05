@@ -1,0 +1,18 @@
+package = "lux-config.nvim"
+version = "4.0.0"
+lua = "5.1"
+
+[description]
+summary = "Configure Neovim plugins from lux.toml"
+labels = [ "lua", "lux", "neovim", "neovim-plugin", "nvim", "plugin-manager" ]
+license = "GPL-3.0"
+
+[dependencies]
+"toml-edit" = ">= 0.3.0"
+
+[test]
+type = "busted-nlua"
+
+[build]
+type = "builtin"
+copy_directories = [ "plugin" ]
