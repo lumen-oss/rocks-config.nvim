@@ -46,6 +46,7 @@
                 cargo
                 stylua
                 lua52Packages.luacheck
+                emmylua-ls
               ];
             shellHook = ''
               if command -v nvim >/dev/null 2>&1; then

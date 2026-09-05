@@ -10,8 +10,7 @@ local rocks_config = {
 local _configured_rocks = {}
 
 ---@class lux-config.Toml: lux-config.Config
----@field rocks? table<string, lux-config.RockSpec[]>
----@field plugins? table<string, lux-config.RockSpec[]>
+---@field dependencies? table<lux-config.rock_name, lux-config.RockSpec>
 ---@field bundles? table<string, lux-config.Bundle>
 
 ---Deduplicates a table that is being used as an array of strings
@@ -39,9 +38,9 @@ local function create_plugin_heuristics(name)
 
     return dedup({
         name,
-        name:gsub("[%.%-]n?vim$", ""):gsub("n?vim%-", ""),
-        name:gsub("[%.%-]lua$", ""):gsub("n?vim%-", ""),
-        name:gsub("%.", "-"),
+        (name:gsub("[%.%-]n?vim$", ""):gsub("n?vim%-", "")),
+        (name:gsub("[%.%-]lua$", ""):gsub("n?vim%-", "")),
+        (name:gsub("%.", "-")),
         name .. "-nvim",
     })
 end
@@ -51,6 +50,7 @@ end
 ---@param mod_name string The module name to search for
 ---@return function | nil
 local function try_get_loader_for_module(mod_name)
+    ---@diagnostic disable-next-line: access-invisible
     for _, searcher in ipairs(package.loaders) do
         local loader = searcher(mod_name)
         if type(loader) == "function" then
@@ -169,7 +169,9 @@ end
 ---@return lux-config.Toml
 local function get_config()
     local lux_toml = toml.get()
-    return vim.tbl_deep_extend("force", {}, constants.DEFAULT_CONFIG, lux_toml or {})
+    local config = vim.tbl_deep_extend("force", {}, constants.DEFAULT_CONFIG, lux_toml or {})
+    ---@cast config lux-config.Toml
+    return config
 end
 
 ---@param rock lux-config.rock_name | lux-config.RockSpec The rock to configure
@@ -180,7 +182,7 @@ function rocks_config.configure(rock, config)
         if _configured_rocks[rock] then
             return
         end
-        local all_plugins = config.plugins
+        local all_plugins = config.dependencies
         ---@cast all_plugins table<string, lux-config.RockSpec>
         if not all_plugins[rock] then
             vim.notify(("[lux-config.nvim]: Plugin %s not found in lux.toml"):format(rock), vim.log.levels.ERROR)
@@ -193,7 +195,7 @@ function rocks_config.configure(rock, config)
     if _configured_rocks[name] then
         return
     end
-    _configured_rocks[rock.name] = true
+    _configured_rocks[name] = true
 
     local plugin_heuristics = create_plugin_heuristics(name)
 
@@ -215,7 +217,7 @@ function rocks_config.configure(rock, config)
     if not found_custom_configuration then
         if type(rock.config) == "string" then
             xpcall(require, function(err)
-                table.insert(rocks_config.failed_to_load, { rock.name, rock.config, err })
+                table.insert(rocks_config.failed_to_load, { name, rock.config, err })
             end, rock.config)
         elseif
             type(rock.config) == "table"
@@ -231,11 +233,11 @@ end
 ---@param rock_name string
 ---@return lux-config.RockSpec | nil
 local function get_rock_from_config(config, rock_name)
-    return (config.plugins or {})[rock_name] or (config.rocks or {})[rock_name]
+    return (config.dependencies or {})[rock_name]
 end
 
 ---@class lux-config.Bundle
----@field items? lux-config.rock_name[]
+---@field items lux-config.rock_name[]
 ---@field config? string
 
 ---@param config lux-config.Toml
@@ -293,6 +295,7 @@ end
 function rocks_config.load_bundle(bundle_name)
     local config = get_config()
     ---@type string, lux-config.Bundle?
+    ---@diagnostic disable-next-line: call-non-callable
     local _, bundle = vim.iter(config.bundles or {}):find(function(name)
         if name == bundle_name then
             return true
@@ -312,6 +315,7 @@ function rocks_config.load_bundle(bundle_name)
         return get_rock_from_config(config, rock_name)
     end
     ---@param item string
+    ---@diagnostic disable-next-line: call-non-callable
     local nonexistent_bundle_item = vim.iter(bundle.items):find(function(item)
         return get_rock(item) == nil
     end)
@@ -340,8 +344,9 @@ function rocks_config.get_bundle(rock_spec)
     local rock_name = type(rock_spec) == "string" and rock_spec or rock_spec.name
     local config = get_config()
     ---@type string, lux-config.Bundle | nil
-    local name, bundle = vim.iter(config.bundles or {}):find(function(_, bundle)
-        if vim.list_contains(bundle.items, rock_name) then
+    ---@diagnostic disable-next-line: call-non-callable
+    local name, bundle = vim.iter(config.bundles or {}):find(function(_, b)
+        if vim.list_contains(b.items, rock_name) then
             return true
         end
         return false
@@ -371,6 +376,7 @@ function rocks_config.configure_all(all_plugins)
         for bundle_name, bundle in pairs(config.bundles) do
             if type(bundle) == "table" and type(bundle.items) == "table" then
                 ---@param item string
+                ---@diagnostic disable-next-line: call-non-callable
                 local nonexistent_bundle_item = vim.iter(bundle.items):find(function(item)
                     return get_rock(item) == nil
                 end)
@@ -391,8 +397,11 @@ Did you make a typo, or is the plugin not installed?
 
                 local is_opt_bundle = not config.config.load_opt_plugins
                     ---@param item string
+                    ---@diagnostic disable-next-line: call-non-callable
                     and vim.iter(bundle.items):any(function(item)
-                        return get_rock(item).opt
+                        local rock = get_rock(item)
+                        ---@cast rock lux-config.RockSpec
+                        return rock.opt
                     end)
                 if is_opt_bundle then
                     goto continue
@@ -405,7 +414,7 @@ Did you make a typo, or is the plugin not installed?
         end
     end
 
-    all_plugins = all_plugins or config.plugins or {}
+    all_plugins = all_plugins or config.dependencies or {}
     for _, rock_spec in pairs(all_plugins) do
         ---@cast rock_spec lux-config.RockSpec
         if not rock_spec.opt or config.config.load_opt_plugins then

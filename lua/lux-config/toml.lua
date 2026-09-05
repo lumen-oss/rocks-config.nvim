@@ -28,7 +28,9 @@ end
 
 ---@return lux-config.Toml | nil
 function M.get()
-    local toml_path = vim.fs.joinpath(vim.fn.stdpath("config"), "lux.toml")
+    local config_dir = vim.fn.stdpath("config")
+    ---@cast config_dir string
+    local toml_path = vim.fs.joinpath(config_dir, "lux.toml")
     local fh = io.open(toml_path, "r")
     if not fh then
         return nil
@@ -36,11 +38,12 @@ function M.get()
     local content = fh:read("*a")
     fh:close()
 
+    ---@diagnostic disable-next-line: unresolved-require
     local toml = require("toml_edit").parse_as_tbl(content)
     local neovim = toml.neovim or {}
 
     return {
-        plugins = normalize_dependencies(toml.dependencies),
+        dependencies = normalize_dependencies(toml.dependencies),
         config = neovim.config,
         bundles = neovim.bundles,
     }
