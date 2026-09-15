@@ -1,5 +1,5 @@
 {
-  description = "Allow rocks.nvim to help configure your plugins";
+  description = "Allow lux.nvim to help configure your plugins";
 
   nixConfig = {
     extra-substituters = "https://lumen-labs.cachix.org";
@@ -7,79 +7,30 @@
   };
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    rocks-nvim-input.url = "github:lumen-oss/rocks.nvim";
-    flake-parts.url = "github:hercules-ci/flake-parts";
-    neorocks.url = "github:lumen-oss/neorocks";
-    gen-luarc.url = "github:mrcjkb/nix-gen-luarc-json";
-    cats-doc.url = "github:mrcjkb/cats-doc";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    lux.url = "github:lumen-oss/lux";
     git-hooks = {
       url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = inputs @ {
-    self,
-    nixpkgs,
-    rocks-nvim-input,
-    flake-parts,
-    neorocks,
-    gen-luarc,
-    git-hooks,
-    ...
-  }: let
-    plugin-overlay = import ./nix/plugin-overlay.nix {
-      inherit self inputs;
-    };
-    test-overlay = import ./nix/test-overlay.nix {
-      inherit self inputs;
-    };
+  outputs = inputs @ {self, ...}: let
+    foreach = xs: f:
+      with inputs.nixpkgs.lib;
+        foldr recursiveUpdate {} (
+          if isList xs
+          then map f xs
+          else if isAttrs xs
+          then mapAttrsToList f xs
+          else throw "foreach: expected list or attrset but got ${typeOf xs}"
+        );
   in
-    flake-parts.lib.mkFlake {inherit inputs;} {
-      systems = [
-        "x86_64-linux"
-        "x86_64-darwin"
-        "aarch64-darwin"
-      ];
-      perSystem = {
-        config,
-        self',
-        inputs',
-        pkgs,
-        system,
-        ...
-      }: let
-        pkgs = import nixpkgs {
-          inherit system;
-          overlays = [
-            neorocks.overlays.default
-            gen-luarc.overlays.default
-            rocks-nvim-input.overlays.default
-            plugin-overlay
-            test-overlay
-          ];
-        };
-        luarc = pkgs.mk-luarc {
-          nvim = pkgs.neovim-nightly;
-          plugins = with pkgs.lua51Packages; [
-            rocks-nvim
-            nvim-nio
-          ];
-        };
-        mk-type-check = luarc:
-          git-hooks.lib.${system}.run {
-            src = self;
-            hooks = {
-              lua-ls = {
-                enable = true;
-                settings.configuration = luarc;
-              };
-            };
-          };
+    foreach inputs.nixpkgs.legacyPackages (
+      system: pkgs: let
+        pkgs = inputs.nixpkgs.legacyPackages.${system}.extend inputs.lux.overlays.default;
 
-        type-check-nightly = mk-type-check luarc;
-        pre-commit-check = git-hooks.lib.${system}.run {
+        pre-commit-check = inputs.git-hooks.lib.${system}.run {
           src = self;
           hooks = {
             alejandra.enable = true;
@@ -89,46 +40,32 @@
             panvimdoc = {
               enable = true;
               name = "panvimdoc";
-              entry = "${pkgs.panvimdoc}/bin/panvimdoc --project-name rocks-config --toc false --treesitter true --demojify true --description ' Allow rocks.nvim to help configure your plugins.' --input-file";
-              files = "README.md";
+              entry = "${pkgs.panvimdoc}/bin/panvimdoc --project-name lux-config --toc true --treesitter true --demojify true --description ' Configure Neovim plugins from lux.toml ' --input-file";
+              files = "docs/.*\\.md$";
             };
           };
         };
       in {
-        devShells.default = pkgs.integration-nightly.overrideAttrs (oa: {
-          name = "rocks-dev.nvim devShell";
+        devShells.${system}.default = pkgs.mkShell {
+          name = "lux-config.nvim-devShell";
+          buildInputs = with pkgs; [
+            lux-cli
+            luajit
+            rustc
+            cargo
+            stylua
+            lua52Packages.luacheck
+            emmylua-ls
+          ];
           shellHook = ''
             ${pre-commit-check.shellHook}
-            ln -fs ${pkgs.luarc-to-json luarc} .luarc.json
+            if command -v nvim >/dev/null 2>&1; then
+              export VIMRUNTIME="$(nvim --clean --headless -c 'lua io.write(vim.env.VIMRUNTIME)' +q)";
+            else
+              export VIMRUNTIME="${pkgs.neovim-unwrapped}/share/nvim/runtime";
+            fi
           '';
-          buildInputs =
-            self.checks.${system}.pre-commit-check.enabledPackages
-            ++ (with pkgs; [
-              lua-language-server
-            ])
-            ++ oa.buildInputs;
-          doCheck = false;
-        });
-
-        packages = rec {
-          default = rocks-config-nvim;
-          inherit (pkgs.luajitPackages) rocks-config-nvim;
         };
-
-        checks = {
-          inherit
-            pre-commit-check
-            type-check-nightly
-            ;
-          inherit
-            (pkgs)
-            integration-stable
-            integration-nightly
-            ;
-        };
-      };
-      flake = {
-        overlays.default = plugin-overlay;
-      };
-    };
+      }
+    );
 }

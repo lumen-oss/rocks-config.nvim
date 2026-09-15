@@ -1,6 +1,6 @@
 local health = {}
 
-local rocks_config = require("rocks-config.internal")
+local rocks_config = require("lux-config.internal")
 
 local function check_for_load_errors()
     vim.health.start("Checking for errors while loading configs")
@@ -13,7 +13,7 @@ local function check_for_load_errors()
     end
 
     for _, dupe in ipairs(errors) do
-        local plugin_name, config_basename, error = unpack(dupe)
+        local plugin_name, config_basename, error = table.unpack(dupe)
         vim.health.error(
             ("Error while loading config '%s.lua' for '%s'."):format(config_basename, plugin_name),
             { ("Error was: %s"):format(error) }
@@ -32,7 +32,7 @@ local function check_for_duplicates()
     end
 
     for _, dupe in ipairs(dupes) do
-        local plugin_name, config_basename = unpack(dupe)
+        local plugin_name, config_basename = table.unpack(dupe)
         vim.health.warn(
             ("Duplicate configuration found for plugin '%s' in file '%s.lua'. Skipping."):format(
                 plugin_name,

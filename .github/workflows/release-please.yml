@@ -13,6 +13,6 @@ jobs:
       - uses: google-github-actions/release-please-action@v3
         with:
           release-type: simple
-          package-name: rocks-config.nvim
+          package-name: lux-config.nvim
           signoff: "Marc Jakobi<marc@jakobi.dev>"
           token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}

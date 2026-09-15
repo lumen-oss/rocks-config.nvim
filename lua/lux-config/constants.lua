@@ -1,8 +1,8 @@
 local constants = {}
 
----@class rocks-config.Config
+---@class lux-config.Config
 constants.DEFAULT_CONFIG = {
-    ---@class rocks-config.Settings
+    ---@class lux-config.Settings
     config = {
         ---@type boolean
         auto_setup = false,
